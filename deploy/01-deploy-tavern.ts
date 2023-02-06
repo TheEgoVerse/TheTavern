@@ -3,13 +3,13 @@ import { DeployFunction } from "hardhat-deploy/types"
 import {
     developmentChains,
     VERIFICATION_BLOCK_CONFIRMATIONS,
+    NFT_CONTRACT_ADDRESS,
+    PREY_CONTRACT_ADDRESS,
+    OWNER_WALLET_ADDRESS,
 } from "../helper-hardhat-config"
 import verify from "../utils/verify"
-import { ethers } from "hardhat"
 
-const deployStorage: DeployFunction = async (
-    hre: HardhatRuntimeEnvironment
-) => {
+const deployTavern: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     const { deployments, network, getNamedAccounts } = hre
     const { deployer } = await getNamedAccounts()
     const { deploy, log } = deployments
@@ -19,27 +19,24 @@ const deployStorage: DeployFunction = async (
         ? 1
         : VERIFICATION_BLOCK_CONFIRMATIONS
 
-    if (developmentChains.includes(network.name)) {
-        // Write code Specific to Local Network Testing
-    }
+    // if (developmentChains.includes(network.name)) {
+    //     // Write code Specific to Local Network Testing
+    // }
 
-    const args: any[] = []
+    const args: any[] = [NFT_CONTRACT_ADDRESS, PREY_CONTRACT_ADDRESS, OWNER_WALLET_ADDRESS]
 
-    const prey = await deploy("AEPStaking", {
+    const prey = await deploy("Tavern", {
         from: deployer,
         log: true,
         args: args,
         waitConfirmations: waitBlockConfirmations,
     })
 
-    if (
-        !developmentChains.includes(network.name) &&
-        process.env.ETHERSCAN_API_KEY
-    ) {
+    if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
         await verify(prey.address, args)
     }
 }
 
-export default deployStorage
-deployStorage.tags = ["all", "prey"]
+export default deployTavern
+deployTavern.tags = ["all", "tavern"]
