@@ -25,7 +25,7 @@ const deployStorage: DeployFunction = async (
 
     const args: any[] = []
 
-    const storage = await deploy("Storage", {
+    const prey = await deploy("AEPStaking", {
         from: deployer,
         log: true,
         args: args,
@@ -37,9 +37,9 @@ const deployStorage: DeployFunction = async (
         process.env.ETHERSCAN_API_KEY
     ) {
         log("Verifying...")
-        await verify(storage.address, args)
+        await verify(prey.address, args)
     }
 }
 
 export default deployStorage
-deployStorage.tags = ["all", "storage"]
+deployStorage.tags = ["all", "prey"]
