@@ -5,9 +5,10 @@ import "hardhat-contract-sizer"
 import "dotenv/config"
 import "@openzeppelin/hardhat-upgrades"
 
-const GOERLI_PRIVATE_KEY = process.env.GOERLI_PRIVATE_KEY
-const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL || ""
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || ""
+const PRIVATE_KEY = process.env.PRIVATE_KEY || ""
+const PRIVATE_KEY2 = process.env.PRIVATE_KEY2 || ""
+const FUJI_RPC_URL = process.env.FUJI_RPC_URL || ""
+const SNOWTRACE_API_KEY = process.env.SNOWTRACE_API_KEY || ""
 
 const config: HardhatUserConfig = {
     solidity: {
@@ -25,12 +26,11 @@ const config: HardhatUserConfig = {
         localhost: {
             chainId: 31337,
         },
-        goerli: {
-            url: GOERLI_RPC_URL,
-            accounts:
-                GOERLI_PRIVATE_KEY !== undefined ? [GOERLI_PRIVATE_KEY] : [],
+        avalancheFujiTestnet: {
+            url: FUJI_RPC_URL,
+            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY, PRIVATE_KEY2] : [],
             saveDeployments: true,
-            chainId: 5,
+            chainId: 43113,
         },
     },
     etherscan: {
@@ -38,9 +38,9 @@ const config: HardhatUserConfig = {
         apiKey: {
             // rinkeby: ETHERSCAN_API_KEY,
             // kovan: ETHERSCAN_API_KEY,
-            goerli: ETHERSCAN_API_KEY,
+            // goerli: ETHERSCAN_API_KEY,
             // avalanche: SNOWTRACE_API_KEY,
-            // avalancheFujiTestnet: SNOWTRACE_API_KEY,
+            avalancheFujiTestnet: SNOWTRACE_API_KEY,
             // polygon: POLYGONSCAN_API_KEY,
         },
     },
