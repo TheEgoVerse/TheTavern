@@ -23,6 +23,8 @@ interface AEPNFT is IERC721 {
     function tokenTierIndex(uint256 id) external view returns (uint256, TIER);
 }
 
+error Tavern__GameLost();
+
 contract Tavern is Ownable, Pausable, ReentrancyGuard {
     struct BoostedNFT {
         uint256 tokenBoostingCoolDown;
@@ -59,6 +61,8 @@ contract Tavern is Ownable, Pausable, ReentrancyGuard {
 
     event PausedStatusUpdated(bool status);
 
+    event GameResult(address player, bool win);
+
     function initBoosting() public onlyOwner {
         require(!initialised, "Already initialised");
         boostStartTime = block.timestamp;
@@ -76,14 +80,19 @@ contract Tavern is Ownable, Pausable, ReentrancyGuard {
     }
 
     function boost(uint256 tokenId) public whenNotPaused nonReentrant {
-        _boost(tokenId);
-    }
-
-    function boostBatch(uint256[] memory tokenIds) public whenNotPaused nonReentrant {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            _boost(tokenIds[i]);
+        if (generateGameResult()) {
+            _boost(tokenId);
+            emit GameResult(msg.sender, true);
+        } else {
+            revert Tavern__GameLost();
         }
     }
+
+    // function boostBatch(uint256[] memory tokenIds) public whenNotPaused nonReentrant {
+    //     for (uint256 i = 0; i < tokenIds.length; i++) {
+    //         _boost(tokenIds[i]);
+    //     }
+    // }
 
     function _boost(uint256 _tokenId) internal {
         require(initialised, "Boosting System: the boosting has not started");
@@ -193,5 +202,13 @@ contract Tavern is Ownable, Pausable, ReentrancyGuard {
         uint256 _id
     ) public view returns (uint256 tokenIndex, AEPNFT.TIER tokenTier) {
         return (nft.tokenTierIndex(_id));
+    }
+
+    function generateGameResult() private view returns (bool) {
+        uint256 entropy = uint256(
+            keccak256(abi.encodePacked(msg.sender, block.timestamp, tx.origin))
+        );
+        uint256 score = (entropy % 100) + 1;
+        return score > 67;
     }
 }
